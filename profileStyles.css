@@ -1,0 +1,235 @@
+@keyframes colorChange {
+    0% {
+        background: linear-gradient(90deg, #020024 0%, #340979 50%, #00d4ff 100%);
+    }
+    50% {
+        background: linear-gradient(90deg, #340979 0%, #340979 100%);
+    }
+    100% {
+        background: #340979;
+    }
+}
+
+
+/* Apply the animation on hover */
+
+.block-cube:hover .bg,
+.block-cube:hover .bg-top,
+.block-cube:hover .bg-right {
+    animation: colorChange 0.5s forwards;
+}
+
+.block-cube:hover .title {
+    color: #ffff;
+    /* Change text color on hover if needed */
+}
+
+
+/* Other existing styles */
+
+*,
+::after,
+::before {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #212121;
+    color: #fff;
+    font-family: monospace, serif;
+    letter-spacing: 0.05em;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.control {
+    position: relative;
+    width: 200px;
+    height: 100px;
+    margin: 10px;
+}
+
+.title {
+    position: relative;
+    z-index: 2;
+    font-size: 20px;
+    text-align: center;
+    line-height: 100px;
+}
+
+.block-cube {
+    position: relative;
+}
+
+.block-cube .bg-top {
+    position: absolute;
+    height: 10px;
+    background: #020024;
+    background: linear-gradient(90deg, #020024 0%, #340979 37%, #00d4ff 94%);
+    bottom: 100%;
+    left: 5px;
+    right: -5px;
+    transform: skew(-45deg, 0);
+    margin: 0;
+}
+
+.block-cube .bg-top .bg-inner {
+    bottom: 0;
+}
+
+.block-cube .bg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: #020024;
+    background: linear-gradient(90deg, #020024 0%, #340979 37%, #00d4ff 94%);
+}
+
+.block-cube .bg-right {
+    position: absolute;
+    background: #020024;
+    background: #00d4ff;
+    top: -5px;
+    z-index: 0;
+    bottom: 5px;
+    width: 10px;
+    left: 100%;
+    transform: skew(0, -45deg);
+}
+
+.block-cube .bg-right .bg-inner {
+    left: 0;
+}
+
+.block-cube .bg .bg-inner {
+    transition: all 0.2s ease-in-out;
+}
+
+.block-cube .bg-inner {
+    background: #212121;
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    right: 2px;
+    bottom: 2px;
+}
+
+.block-cube .text {
+    position: relative;
+    z-index: 2;
+}
+
+.block-cube.block-input input {
+    position: relative;
+    z-index: 2;
+}
+
+.block-cube.block-input input:focus~.bg-right .bg-inner,
+.block-cube.block-input input:focus~.bg-top .bg-inner,
+.block-cube.block-input input:focus~.bg-inner .bg-inner {
+    top: 100%;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.block-cube .bg .bg-inner,
+.block-cube .bg-right .bg-inner,
+.block-cube .bg-top .bg-inner,
+.block-cube .bg-inner {
+    transition: all 0.2s ease-in-out;
+}
+
+.block-cube.block-input .bg-top,
+.block-cube.block-input .bg-right,
+.block-cube.block-input .bg {
+    transition: background 0.2s ease-in-out;
+}
+
+.block-cube.block-input .bg-right .bg-inner,
+.block-cube.block-input .bg-top .bg-inner {
+    transition: all 0.2s ease-in-out;
+}
+
+.block-cube.block-input:focus .bg-top,
+.block-cube.block-input:focus .bg-right,
+.block-cube.block-input:focus .bg,
+.block-cube.block-input:hover .bg-top,
+.block-cube.block-input:hover .bg-right,
+.block-cube.block-input:hover .bg {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.block-cube.block-cube-hover:focus .bg .bg-inner,
+.block-cube.block-cube-hover:hover .bg .bg-inner {
+    top: 100%;
+}
+
+
+/* Box sizes */
+
+.box1 {
+    width: 150px;
+    height: 50px;
+}
+
+.box2 {
+    width: 200px;
+    height: 60px;
+}
+
+.box3 {
+    width: 250px;
+    height: 70px;
+}
+
+.box4 {
+    width: 300px;
+    height: 80px;
+}
+
+.box5 {
+    width: 350px;
+    height: 90px;
+}
+
+
+/* Hover effect for boxes */
+
+.box1:hover,
+.box2:hover,
+.box3:hover,
+.box4:hover,
+.box5:hover {
+    background-color: #00d4ff;
+    color: #fff;
+    /* Change text color to white on hover */
+    font-weight: bold;
+    /* Make text bold on hover */
+    transition: background-color 0.3s ease, color 0.3s ease, font-weight 0.3s ease;
+}
+
+
+/* Center text within each box */
+
+.box1,
+.box2,
+.box3,
+.box4,
+.box5 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
