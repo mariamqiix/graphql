@@ -12,6 +12,18 @@ const userTransactionQuery = `
                   }
                 }`;
 
+const userTransactionUpQuery = `
+                query GetTransactionData($userId: Int!) {
+                  transaction(where: { _and: [{ userId: { _eq: $userId } }, { type: { _eq: "up" } }] }) {                    id
+                    type
+                    amount
+                    objectId
+                    userId
+                    createdAt
+                    path
+                  }
+                }`;
+
 const userProgressQuery = `
                 query GetUserProgress($userId: Int!) {
                   progress(where: { userId: { _eq: $userId }, object: { type: { _eq: "project" } } }) {
@@ -100,20 +112,17 @@ async function start() {
     try {
         const user = await getUser(); // Wait for getUser function to resolve
         userId = user.id;
-        const transcation = await fetchData(userTransactionQuery);
+        const transactionData = await fetchData(userTransactionUpQuery);
+        console.log(transactionData); // Log the data to see its structure
         const progress = await fetchData(userProgressQuery);
         const result = await fetchData(userResultQuery);
         const userData = await fetchData(userDetailsQuery);
-
-        console.log(transcation);
-        console.log(progress);
-        console.log(result);
-
         // Call the function to display user information
-        displayUserInfo(userData);
+        // displayUserInfo(userData);
+        PieChart(generateSlices(createPathObject(transactionData.transaction)));
         const username = userData.user[0].login;
         const level = userData.event_user[0].level;
-        console.log(Details);
+        console.log(userData);
         console.log(username);
         document.getElementById("userName").innerHTML = username;
         document.getElementById("level").innerHTML = level;
@@ -202,6 +211,148 @@ async function fetchData(query) {
     }
 }
 
+const svgElement = document.getElementById("pieChart");
+
+function interpolateColor(color1, color2, factor) {
+    // Convert hex to RGB
+    const hexToRgb = (hex) => {
+        const bigint = parseInt(hex.slice(1), 16);
+        return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+    };
+
+    const rgbToHex = (r, g, b) => {
+        return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+    };
+
+    const rgb1 = hexToRgb(color1);
+    const rgb2 = hexToRgb(color2);
+
+    // Interpolate between the two colors
+    const resultRgb = rgb1.map((val, i) => Math.round(val + factor * (rgb2[i] - val)));
+
+    // Convert back to hex
+    return rgbToHex(...resultRgb);
+}
+
+function generateSlices(data) {
+    // Step 1: Calculate the total sum of all values
+    const total = Object.values(data).reduce((sum, value) => sum + value, 0);
+
+    // Step 2: Define the color stops for the gradient
+    const colorStops = ["#050152", "#340979", "#00d4ff"];
+
+    // Step 3: Create an array to store the slice objects
+    const slices = [];
+    let colorIndex = 0; // Initialize color index for selecting colors
+
+    // Step 4: Iterate through each path in the data object
+    Object.entries(data).forEach(([path, value], index) => {
+        // Calculate the ratio
+        const ratio = value / total;
+
+        // Calculate the interpolation factor for color
+        const factor = index / (Object.keys(data).length - 1);
+
+        // Interpolate colors between stops
+        const color1 = colorStops[Math.floor(factor * (colorStops.length - 1))];
+        const color2 = colorStops[Math.ceil(factor * (colorStops.length - 1))];
+        const colorFactor = (factor * (colorStops.length - 1)) % 1;
+        const color = interpolateColor(color1, color2, colorFactor);
+
+        // Create the slice object and add it to the slices array
+        slices.push({ path, ratio, color });
+    });
+
+    return slices; // Return the array of slice objects
+}
+
+function createPathObject(transactionData) {
+    const pathCount = {}; // Initialize an empty object to store path counts
+
+    // Iterate through each transaction in the array
+    transactionData.forEach((transaction) => {
+        const path = transaction.path; // Get the path from the current transaction
+
+        // Check if the path already exists in the object
+        if (pathCount[path]) {
+            pathCount[path] += 1; // If it exists, increment the count by 1
+        } else {
+            pathCount[path] = 1; // If it does not exist, initialize it with 1
+        }
+    });
+
+    return pathCount; // Return the object with path counts
+}
+
+function calculatePieSlicePath(cx, cy, radius, startAngle, ratio) {
+    // Convert ratio to end angle
+    const endAngle = startAngle + ratio * 360;
+
+    // Convert angles to radians
+    const startRad = (Math.PI / 180) * startAngle;
+    const endRad = (Math.PI / 180) * endAngle;
+
+    // Calculate start and end points
+    const x1 = cx + radius * Math.cos(startRad);
+    const y1 = cy + radius * Math.sin(startRad);
+    const x2 = cx + radius * Math.cos(endRad);
+    const y2 = cy + radius * Math.sin(endRad);
+
+    // Determine if the arc is a large arc (greater than 180 degrees)
+    const largeArcFlag = ratio > 0.5 ? 1 : 0;
+
+    // SVG path for the slice
+    const pathData = `M ${cx} ${cy} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
+
+    return pathData;
+}
+const tooltip = document.getElementById("tooltip"); // Get the tooltip element
+
+// Function to append paths dynamically and set up event listeners
+function appendPathToSVG(svgElement, pathData, fillColor, pathId) {
+    const newPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    newPath.setAttribute("d", pathData);
+    newPath.setAttribute("fill", fillColor);
+    newPath.setAttribute("id", pathId);
+    svgElement.appendChild(newPath);
+
+    // Adding event listeners to the newly created path
+    newPath.addEventListener("mouseenter", () => {
+        tooltip.style.display = "block";
+        tooltip.textContent = newPath.id;
+    });
+
+    newPath.addEventListener("mousemove", (event) => {
+        // Calculate tooltip position relative to pieChartDiv
+        const pieChartRect = svgElement.getBoundingClientRect();
+        const tooltipX = event.clientX - pieChartRect.left;
+        const tooltipY = event.clientY - pieChartRect.top;
+
+        tooltip.style.left = `${tooltipX}px`;
+        tooltip.style.top = `${tooltipY + 10}px`; // Slight offset below the cursor
+    });
+
+    newPath.addEventListener("mouseleave", () => {
+        tooltip.style.display = "none";
+    });
+}
+// Initialize SVG and add slices
+
+function PieChart(slices) {
+    // Initialize SVG and add slices
+    const svgElement = document.getElementById("pieChart");
+    const cx = 0; // Center x
+    const cy = 0; // Center y
+    const radius = 100; // Radius of the pie
+    let startAngle = 0; // Starting angle in degrees
+    // Loop through slices and append paths
+    slices.forEach((slice) => {
+        const pathData = calculatePieSlicePath(cx, cy, radius, startAngle, slice.ratio);
+        appendPathToSVG(svgElement, pathData, slice.color, slice.path);
+        startAngle += slice.ratio * 360; // Update start angle for next slice
+    });
+}
+
 // Mock data received from the GraphQL query
 const transactionData = {
     transaction: [{
@@ -224,17 +375,3 @@ const transactionData = {
         },
     ],
 };
-
-// Calculate the scaling factor for the bars
-const scaleFactor = 2;
-
-// Update the bar heights based on the data
-document.querySelectorAll(".bar").forEach((bar, index) => {
-    bar.setAttribute("height", transactionData.transaction[index].amount * scaleFactor);
-    bar.setAttribute("y", 120 - transactionData.transaction[index].amount * scaleFactor);
-    bar.nextElementSibling.setAttribute(
-        "y",
-        120 - transactionData.transaction[index].amount * scaleFactor - 5
-    );
-    bar.nextElementSibling.textContent = transactionData.transaction[index].amount;
-});

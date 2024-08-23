@@ -197,27 +197,27 @@ body {
 /* Box sizes */
 
 .box1 {
-    width: 30%;
+    width: 320px;
     height: 400px;
 }
 
 .box2 {
-    width: 25%;
+    width: 320px;
     height: 200px;
 }
 
 .box3 {
-    width: 250px;
-    height: 70px;
+    width: 320px;
+    height: 300px;
 }
 
 .box4 {
-    width: 300px;
+    width: 320px;
     height: 80px;
 }
 
 .box5 {
-    width: 350px;
+    width: 320px;
     height: 90px;
 }
 
@@ -299,4 +299,47 @@ body {
 .control.block-cube.box1:hover .level {
     display: block;
     /* Show the .level element on hover */
+}
+
+.pieChartDiv {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    /* Relative positioning to contain absolute positioning of the tooltip */
+    z-index: 5;
+}
+
+#pieChart {
+    z-index: 10;
+    /* Ensure the pie chart is above other elements */
+}
+
+#tooltip {
+    display: none;
+    /* Hidden by default */
+    position: absolute;
+    /* Positioned absolutely to stay within the container */
+    bottom: 0;
+    /* Align tooltip at the bottom of the pieChartDiv */
+    left: 50%;
+    /* Center the tooltip horizontally */
+    transform: translateX(-50%);
+    /* Center the tooltip with respect to its own width */
+    font-size: 12px;
+    color: aliceblue;
+    /* background-color: rgba(0, 0, 0, 0.7); */
+    /* Keep it minimal, for better readability */
+    padding: 2px 5px;
+    /* Reduced padding to keep it close to the text */
+    border-radius: 4px;
+    /* Rounded corners */
+    z-index: 15;
+    /* Ensure tooltip is above other elements */
+    white-space: nowrap;
+    /* Prevent the tooltip text from breaking into multiple lines */
+    height: auto;
+    /* Ensure the height of the tooltip is determined by its content */
+    box-shadow: none;
+    /* Remove any shadow if not needed */
 }
