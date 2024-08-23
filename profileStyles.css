@@ -2,9 +2,11 @@
     0% {
         background: linear-gradient(90deg, #020024 0%, #340979 50%, #00d4ff 100%);
     }
+
     50% {
         background: linear-gradient(90deg, #340979 0%, #340979 100%);
     }
+
     100% {
         background: #340979;
     }
@@ -178,15 +180,16 @@ body {
 
 
 /* Box sizes */
-
+#user-info,
 .box1 {
-    width: 150px;
-    height: 50px;
+    width: 800px;
+    height: 110px;
+    padding-top: 13px;
 }
 
 .box2 {
-    width: 200px;
-    height: 60px;
+    width: 300px;
+    height: 100px;
 }
 
 .box3 {
@@ -232,4 +235,34 @@ body {
     justify-content: center;
     align-items: center;
     text-align: center;
+}
+
+/* Add your CSS styles here */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border: none;
+    padding: 8px;
+    text-align: center;
+}
+
+/* Add your CSS styles here */
+.chart {
+    width: 400px;
+    height: 300px;
+    border: 1px solid #ccc;
+}
+
+.bar {
+    fill: steelblue;
+}
+
+.bar text {
+    fill: #fff;
+    font-size: 12px;
+    text-anchor: middle;
 }
