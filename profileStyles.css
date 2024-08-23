@@ -1,14 +1,35 @@
+/* Define the keyframes for a smooth gradient transition */
+
 @keyframes colorChange {
     0% {
-        background: linear-gradient(90deg, #020024 0%, #340979 50%, #00d4ff 100%);
+        background: linear-gradient(90deg, #020024 0%, #340979 37%, #00d4ff 94%);
+        background-size: 200% 200%;
+        background-position: 0% 50%;
     }
-
-    50% {
-        background: linear-gradient(90deg, #340979 0%, #340979 100%);
+    20% {
+        background: linear-gradient(90deg, #040020 4%, #340979 39%, #00cce8 90%);
+        background-size: 200% 200%;
+        background-position: 5% 50%;
     }
-
+    40% {
+        background: linear-gradient(90deg, #0a011b 8%, #340979 41%, #00bbd2 86%);
+        background-size: 200% 200%;
+        background-position: 10% 50%;
+    }
+    60% {
+        background: linear-gradient(90deg, #0f0117 12%, #340979 45%, #00aadf 85%);
+        background-size: 200% 200%;
+        background-position: 20% 50%;
+    }
+    80% {
+        background: linear-gradient(90deg, #110012 14%, #340979 50%, #00a5cc 80%);
+        background-size: 200% 200%;
+        background-position: 30% 50%;
+    }
     100% {
-        background: #340979;
+        background: linear-gradient(90deg, #110012 15%, #340979 55%, #00aadf 85%);
+        background-size: 200% 200%;
+        background-position: 40% 50%;
     }
 }
 
@@ -18,7 +39,10 @@
 .block-cube:hover .bg,
 .block-cube:hover .bg-top,
 .block-cube:hover .bg-right {
-    animation: colorChange 0.5s forwards;
+    animation: colorChange 3s ease-in-out forwards;
+    /* 3s duration for a smooth transition */
+    transition: background 3s ease-in-out;
+    /* Ensure smooth transition between keyframes */
 }
 
 .block-cube:hover .title {
@@ -57,8 +81,8 @@ body {
 
 .control {
     position: relative;
-    width: 200px;
-    height: 100px;
+    /* width: 200px;
+    height: 100px; */
     margin: 10px;
 }
 
@@ -164,15 +188,6 @@ body {
     transition: all 0.2s ease-in-out;
 }
 
-.block-cube.block-input:focus .bg-top,
-.block-cube.block-input:focus .bg-right,
-.block-cube.block-input:focus .bg,
-.block-cube.block-input:hover .bg-top,
-.block-cube.block-input:hover .bg-right,
-.block-cube.block-input:hover .bg {
-    background: rgba(255, 255, 255, 0.8);
-}
-
 .block-cube.block-cube-hover:focus .bg .bg-inner,
 .block-cube.block-cube-hover:hover .bg .bg-inner {
     top: 100%;
@@ -180,16 +195,15 @@ body {
 
 
 /* Box sizes */
-#user-info,
+
 .box1 {
-    width: 800px;
-    height: 110px;
-    padding-top: 13px;
+    width: 30%;
+    height: 400px;
 }
 
 .box2 {
-    width: 300px;
-    height: 100px;
+    width: 25%;
+    height: 200px;
 }
 
 .box3 {
@@ -210,19 +224,6 @@ body {
 
 /* Hover effect for boxes */
 
-.box1:hover,
-.box2:hover,
-.box3:hover,
-.box4:hover,
-.box5:hover {
-    background-color: #00d4ff;
-    color: #fff;
-    /* Change text color to white on hover */
-    font-weight: bold;
-    /* Make text bold on hover */
-    transition: background-color 0.3s ease, color 0.3s ease, font-weight 0.3s ease;
-}
-
 
 /* Center text within each box */
 
@@ -237,32 +238,65 @@ body {
     text-align: center;
 }
 
-/* Add your CSS styles here */
-table {
+.profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     width: 100%;
-    border-collapse: collapse;
+    height: 100%;
+    position: relative;
+    z-index: 1;
+    /* Ensure .profile is below .box1 */
 }
 
-th,
-td {
-    border: none;
-    padding: 8px;
-    text-align: center;
+.profile img {
+    width: 200px;
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 5%;
 }
 
-/* Add your CSS styles here */
-.chart {
-    width: 400px;
-    height: 300px;
-    border: 1px solid #ccc;
+.profile #userName {
+    margin-top: 5%;
+    color: white;
+    font-size: 2em;
 }
 
-.bar {
-    fill: steelblue;
+
+/* Add blur effect on hover to the container */
+
+.control.block-cube.box1 .profile {
+    transition: filter 0.3s ease;
+    /* Smooth transition for the blur effect */
 }
 
-.bar text {
-    fill: #fff;
-    font-size: 12px;
-    text-anchor: middle;
+.control.block-cube.box1:hover .profile {
+    filter: blur(20px);
+    /* Adjust the blur radius as needed */
+}
+
+.level {
+    z-index: 4;
+    display: none;
+    position: absolute;
+    /* Use absolute positioning */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 5em;
+    /* Center the element */
+    /* Initially hide the .level element */
+    text-shadow: 0 0 5px rgb(0, 204, 232, 0.8), /* Small glow */
+    0 0 10px rgb(0, 204, 232, 0.7), /* Medium glow */
+    0 0 15px rgb(0, 204, 232, 0.6), /* Larger glow */
+    0 0 20px rgb(0, 204, 232, 0.5), /* Even larger glow */
+    0 0 25px rgb(0, 204, 232, 0.4), /* Larger glow */
+    0 0 30px rgb(0, 204, 232, 0.3);
+    /* Largest glow */
+}
+
+.control.block-cube.box1:hover .level {
+    display: block;
+    /* Show the .level element on hover */
 }

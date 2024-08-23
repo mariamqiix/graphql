@@ -52,7 +52,6 @@ const objectQuery = `
                 }
               }`;
 
-
 const userDetailsQuery = `
        query GetUser($userId: Int!) {
             user {
@@ -92,7 +91,6 @@ const userSkillsQuery = `
         }
   `;
 
-
 // document.getElementById('logoutForm').addEventListener('click', function () {
 //     localStorage.removeItem('jwtToken');
 //     window.location.href = 'index.html';
@@ -113,9 +111,14 @@ async function start() {
 
         // Call the function to display user information
         displayUserInfo(userData);
-
+        const username = userData.user[0].login;
+        const level = userData.event_user[0].level;
+        console.log(Details);
+        console.log(username);
+        document.getElementById("userName").innerHTML = username;
+        document.getElementById("level").innerHTML = level;
     } catch (error) {
-        console.error('GraphQL Error:', error);
+        console.error("GraphQL Error:", error);
     }
 }
 
@@ -123,11 +126,11 @@ start();
 
 async function getUser() {
     try {
-        const response = await fetch('https://learn.reboot01.com/api/graphql-engine/v1/graphql', {
-            method: 'POST',
+        const response = await fetch("https://learn.reboot01.com/api/graphql-engine/v1/graphql", {
+            method: "POST",
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`,
-                'Content-Type': 'application/json'
+                Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+                "Content-Type": "application/json",
             },
             body: JSON.stringify({
                 query: `
@@ -137,12 +140,12 @@ async function getUser() {
                             login
                         }
                     }
-                `
+                `,
             }),
         });
 
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error("Network response was not ok");
         }
 
         const data = await response.json();
@@ -159,28 +162,27 @@ async function getUser() {
 
         return data.data.user[0];
     } catch (error) {
-        console.error('GraphQL Error:', error);
+        console.error("GraphQL Error:", error);
     }
 }
-
 
 async function fetchData(query) {
     const variables = { userId };
     try {
-        const response = await fetch('https://learn.reboot01.com/api/graphql-engine/v1/graphql', {
-            method: 'POST',
+        const response = await fetch("https://learn.reboot01.com/api/graphql-engine/v1/graphql", {
+            method: "POST",
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`,
-                'Content-Type': 'application/json'
+                Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+                "Content-Type": "application/json",
             },
             body: JSON.stringify({
                 query,
-                variables
+                variables,
             }),
         });
 
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error("Network response was not ok");
         }
 
         const data = await response.json();
@@ -188,54 +190,28 @@ async function fetchData(query) {
         if (data.errors) {
             console.error(data.errors);
             if (data.errors[0].message === "Could not verify JWT: JWTExpired") {
-                localStorage.removeItem('hasura-jwt');
-                window.location.href = 'index.html';
+                localStorage.removeItem("hasura-jwt");
+                window.location.href = "index.html";
             }
             return;
         }
 
         return data.data;
     } catch (error) {
-        console.error('GraphQL Error:', error);
+        console.error("GraphQL Error:", error);
     }
-}
-
-// Function to display user information in a div
-function displayUserInfo(data) {
-    const userInfoDiv = document.getElementById('user-info');
-    userInfoDiv.innerHTML = `
-    <table>
-        <tr>
-            <td>User ID:</td>
-            <td>Login:</td>
-            <td>Total Up:</td>
-            <td>Total Down:</td>
-            <td>Audit Ratio:</td>
-            <td>Level:</td>
-        </tr>
-        <tr>
-            <td>${data.user[0].id}</td>
-            <td>${data.user[0].login}</td>
-            <td>${data.user[0].totalUp}</td>
-            <td>${data.user[0].totalDown}</td>
-            <td>${data.user[0].auditRatio}</td>
-            <td>${data.event_user[0].level}</td>
-        </tr>
-    </table>
-    `;
 }
 
 // Mock data received from the GraphQL query
 const transactionData = {
-    transaction: [
-        {
+    transaction: [{
             id: 1,
             type: "xp",
             amount: 50,
             objectId: 123,
             userId: 1,
             createdAt: "2024-08-23",
-            path: "/path/to/project"
+            path: "/path/to/project",
         },
         {
             id: 2,
@@ -244,18 +220,21 @@ const transactionData = {
             objectId: 456,
             userId: 1,
             createdAt: "2024-08-24",
-            path: "/path/to/another/project"
-        }
-    ]
+            path: "/path/to/another/project",
+        },
+    ],
 };
 
 // Calculate the scaling factor for the bars
 const scaleFactor = 2;
 
 // Update the bar heights based on the data
-document.querySelectorAll('.bar').forEach((bar, index) => {
-    bar.setAttribute('height', transactionData.transaction[index].amount * scaleFactor);
-    bar.setAttribute('y', 120 - transactionData.transaction[index].amount * scaleFactor);
-    bar.nextElementSibling.setAttribute('y', 120 - transactionData.transaction[index].amount * scaleFactor - 5);
+document.querySelectorAll(".bar").forEach((bar, index) => {
+    bar.setAttribute("height", transactionData.transaction[index].amount * scaleFactor);
+    bar.setAttribute("y", 120 - transactionData.transaction[index].amount * scaleFactor);
+    bar.nextElementSibling.setAttribute(
+        "y",
+        120 - transactionData.transaction[index].amount * scaleFactor - 5
+    );
     bar.nextElementSibling.textContent = transactionData.transaction[index].amount;
 });
