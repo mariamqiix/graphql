@@ -14,6 +14,18 @@ const userTransactionQuery = `
 
 const userTransactionUpQuery = `
                 query GetTransactionData($userId: Int!) {
+                  transaction(where: { _and: [{ userId: { _eq: $userId } }, { type: { _eq: "down" } }] }) {                    id
+                    type
+                    amount
+                    objectId
+                    userId
+                    createdAt
+                    path
+                  }
+                }`;
+
+const userTransactionDownQuery = `
+                query GetTransactionData($userId: Int!) {
                   transaction(where: { _and: [{ userId: { _eq: $userId } }, { type: { _eq: "up" } }] }) {                    id
                     type
                     amount
@@ -103,27 +115,21 @@ const userSkillsQuery = `
         }
   `;
 
-// document.getElementById('logoutForm').addEventListener('click', function () {
-//     localStorage.removeItem('jwtToken');
-//     window.location.href = 'index.html';
-// });
-
 async function start() {
     try {
         const user = await getUser(); // Wait for getUser function to resolve
         userId = user.id;
-        const transactionData = await fetchData(userTransactionUpQuery);
-        console.log(transactionData); // Log the data to see its structure
+        const transactionUpData = await fetchData(userTransactionUpQuery);
+        const transactionDownData = await fetchData(userTransactionDownQuery);
         const progress = await fetchData(userProgressQuery);
         const result = await fetchData(userResultQuery);
         const userData = await fetchData(userDetailsQuery);
         // Call the function to display user information
-        // displayUserInfo(userData);
-        PieChart(generateSlices(createPathObject(transactionData.transaction)));
+        addAuditRatio(userData, transactionUpData.transaction, transactionDownData.transaction);
+        PieChart(generateSlices(createPathObject(transactionUpData.transaction)));
         const username = userData.user[0].login;
         const level = userData.event_user[0].level;
         console.log(userData);
-        console.log(username);
         document.getElementById("userName").innerHTML = username;
         document.getElementById("level").innerHTML = level;
     } catch (error) {
@@ -211,10 +217,11 @@ async function fetchData(query) {
     }
 }
 
+/// to create teh pie chart
+
 const svgElement = document.getElementById("pieChart");
 
 function interpolateColor(color1, color2, factor) {
-    // Convert hex to RGB
     const hexToRgb = (hex) => {
         const bigint = parseInt(hex.slice(1), 16);
         return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
@@ -226,89 +233,59 @@ function interpolateColor(color1, color2, factor) {
 
     const rgb1 = hexToRgb(color1);
     const rgb2 = hexToRgb(color2);
-
-    // Interpolate between the two colors
     const resultRgb = rgb1.map((val, i) => Math.round(val + factor * (rgb2[i] - val)));
-
-    // Convert back to hex
     return rgbToHex(...resultRgb);
 }
 
 function generateSlices(data) {
-    // Step 1: Calculate the total sum of all values
     const total = Object.values(data).reduce((sum, value) => sum + value, 0);
-
-    // Step 2: Define the color stops for the gradient
     const colorStops = ["#050152", "#340979", "#00d4ff"];
-
-    // Step 3: Create an array to store the slice objects
     const slices = [];
-    let colorIndex = 0; // Initialize color index for selecting colors
 
-    // Step 4: Iterate through each path in the data object
     Object.entries(data).forEach(([path, value], index) => {
-        // Calculate the ratio
         const ratio = value / total;
-
-        // Calculate the interpolation factor for color
         const factor = index / (Object.keys(data).length - 1);
 
-        // Interpolate colors between stops
         const color1 = colorStops[Math.floor(factor * (colorStops.length - 1))];
         const color2 = colorStops[Math.ceil(factor * (colorStops.length - 1))];
         const colorFactor = (factor * (colorStops.length - 1)) % 1;
         const color = interpolateColor(color1, color2, colorFactor);
-
-        // Create the slice object and add it to the slices array
         slices.push({ path, ratio, color });
     });
 
-    return slices; // Return the array of slice objects
+    return slices;
 }
 
 function createPathObject(transactionData) {
-    const pathCount = {}; // Initialize an empty object to store path counts
-
-    // Iterate through each transaction in the array
+    const pathCount = {};
     transactionData.forEach((transaction) => {
-        const path = transaction.path; // Get the path from the current transaction
-
-        // Check if the path already exists in the object
+        const path = transaction.path;
         if (pathCount[path]) {
-            pathCount[path] += 1; // If it exists, increment the count by 1
+            pathCount[path] += 1;
         } else {
-            pathCount[path] = 1; // If it does not exist, initialize it with 1
+            pathCount[path] = 1;
         }
     });
 
-    return pathCount; // Return the object with path counts
+    return pathCount;
 }
 
 function calculatePieSlicePath(cx, cy, radius, startAngle, ratio) {
-    // Convert ratio to end angle
     const endAngle = startAngle + ratio * 360;
-
-    // Convert angles to radians
     const startRad = (Math.PI / 180) * startAngle;
     const endRad = (Math.PI / 180) * endAngle;
-
-    // Calculate start and end points
     const x1 = cx + radius * Math.cos(startRad);
     const y1 = cy + radius * Math.sin(startRad);
     const x2 = cx + radius * Math.cos(endRad);
     const y2 = cy + radius * Math.sin(endRad);
 
-    // Determine if the arc is a large arc (greater than 180 degrees)
     const largeArcFlag = ratio > 0.5 ? 1 : 0;
-
-    // SVG path for the slice
     const pathData = `M ${cx} ${cy} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
 
     return pathData;
 }
-const tooltip = document.getElementById("tooltip"); // Get the tooltip element
+const tooltip = document.getElementById("tooltip");
 
-// Function to append paths dynamically and set up event listeners
 function appendPathToSVG(svgElement, pathData, fillColor, pathId) {
     const newPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
     newPath.setAttribute("d", pathData);
@@ -336,7 +313,6 @@ function appendPathToSVG(svgElement, pathData, fillColor, pathId) {
         tooltip.style.display = "none";
     });
 }
-// Initialize SVG and add slices
 
 function PieChart(slices) {
     // Initialize SVG and add slices
@@ -353,25 +329,43 @@ function PieChart(slices) {
     });
 }
 
-// Mock data received from the GraphQL query
-const transactionData = {
-    transaction: [{
-            id: 1,
-            type: "xp",
-            amount: 50,
-            objectId: 123,
-            userId: 1,
-            createdAt: "2024-08-23",
-            path: "/path/to/project",
-        },
-        {
-            id: 2,
-            type: "xp",
-            amount: 75,
-            objectId: 456,
-            userId: 1,
-            createdAt: "2024-08-24",
-            path: "/path/to/another/project",
-        },
-    ],
-};
+/// end of the pie chart decleration
+
+//// audit ratio bar
+
+function addAuditRatio(userData, transactionUpData, transactionDownData) {
+    const auditRatio = userData.user[0].auditRatio;
+
+    // Calculate total amount for transactionUpData
+    const totalUpAmount = transactionUpData.reduce((accumulator, transaction) => {
+        return accumulator + transaction.amount;
+    }, 0);
+
+    // Calculate total amount for transactionDownData
+    const totalDownAmount = transactionDownData.reduce((accumulator, transaction) => {
+        return accumulator + transaction.amount;
+    }, 0);
+
+    document.getElementById("doneValue").innerHTML = formatToBillions(totalDownAmount);
+    document.getElementById("receivedValue").innerHTML = formatToBillions(totalDownAmount);
+    document.getElementById("userRatio").innerHTML = auditRatio.toFixed(1);
+
+    if (auditRatio.toFixed(1) < 1) {
+        document.getElementById("userMessage").innerHTML = "you are so bad";
+    } else if (auditRatio.toFixed(1) === 1) {
+        document.getElementById("userMessage").innerHTML = "nice work";
+    } else {
+        document.getElementById("userMessage").innerHTML = "يابن المحظوظة";
+    }
+    // Optionally calculate a combined ratio or any other metric as needed
+    console.log("Total Done:", formatToBillions(totalDownAmount));
+    console.log("Total Received:", formatToBillions(totalUpAmount));
+    console.log("Combined Audit Ratio:", auditRatio.toFixed(1));
+}
+
+// Helper function to format numbers to billions with two decimal places
+function formatToBillions(amount) {
+    const billion = 1e6;
+    const roundedAmount = (amount / billion).toFixed(2);
+    return `${roundedAmount} MB`;
+}

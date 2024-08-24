@@ -1,5 +1,6 @@
 /* Define the keyframes for a smooth gradient transition */
 
+@import url(https://fonts.googleapis.com/earlyaccess/amiri.css);
 @keyframes colorChange {
     0% {
         background: linear-gradient(90deg, #020024 0%, #340979 37%, #00d4ff 94%);
@@ -31,6 +32,10 @@
         background-size: 200% 200%;
         background-position: 40% 50%;
     }
+}
+
+#userMessage {
+    font-family: "Amiri", serif;
 }
 
 
@@ -342,4 +347,11 @@ body {
     /* Ensure the height of the tooltip is determined by its content */
     box-shadow: none;
     /* Remove any shadow if not needed */
+}
+
+.ratio {
+    align-items: center;
+    justify-content: flex-start;
+    z-index: 10;
+    margin: 0;
 }
