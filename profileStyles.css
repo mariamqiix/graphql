@@ -1,6 +1,7 @@
 /* Define the keyframes for a smooth gradient transition */
 
 @import url(https://fonts.googleapis.com/earlyaccess/amiri.css);
+@import url("https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap");
 @keyframes colorChange {
     0% {
         background: linear-gradient(90deg, #020024 0%, #340979 37%, #00d4ff 94%);
@@ -290,6 +291,11 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 5em;
+    font-family: "Pixelify Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+    color: rgb(0, 238, 255);
     /* Center the element */
     /* Initially hide the .level element */
     text-shadow: 0 0 5px rgb(0, 204, 232, 0.8), /* Small glow */
