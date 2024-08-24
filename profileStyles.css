@@ -82,15 +82,26 @@ body {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: flex-start;
+    /* Align items to the start vertically */
     gap: 20px;
 }
 
 .control {
     position: relative;
-    /* width: 200px;
-    height: 100px; */
     margin: 10px;
+    width: 320px;
+    /* Fixed width for all boxes */
 }
+
+.stacked-container {
+    display: flex;
+    gap: 20px;
+    /* Space between box2 and box5 */
+}
+
+
+/* Two items per row, considering gap */
 
 .title {
     position: relative;
@@ -127,7 +138,7 @@ body {
     right: 0;
     bottom: 0;
     background: #020024;
-    background: linear-gradient(90deg, #020024 0%, #340979 37%, #00d4ff 94%);
+    background: linear-gradient(90deg, #020024 0%, rgb(52, 9, 121) 37%, #00d4ff 94%);
 }
 
 .block-cube .bg-right {
@@ -202,29 +213,38 @@ body {
 
 /* Box sizes */
 
+.boxes {
+    width: auto;
+    height: auto;
+}
+
 .box1 {
     width: 320px;
-    height: 400px;
+    height: 440px;
 }
 
 .box2 {
     width: 320px;
     height: 200px;
-}
-
-.box3 {
-    width: 320px;
-    height: 300px;
-}
-
-.box4 {
-    width: 320px;
-    height: 80px;
+    margin-bottom: 0;
+    /* Reset margin-bottom */
 }
 
 .box5 {
     width: 320px;
-    height: 90px;
+    height: 200px;
+    margin-top: 40px;
+    /* Add margin-top to create space */
+}
+
+.box3 {
+    width: 320px;
+    height: 320px;
+}
+
+.box4 {
+    width: 320px;
+    height: 320px;
 }
 
 
@@ -242,6 +262,10 @@ body {
     justify-content: center;
     align-items: center;
     text-align: center;
+    width: 320px;
+    /* Fixed width */
+    margin-bottom: 20px;
+    /* Add margin to the bottom of each box */
 }
 
 .profile {
@@ -360,4 +384,59 @@ body {
     justify-content: flex-start;
     z-index: 10;
     margin: 0;
+}
+
+.control.block-cube.box4 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+#radarChartDiv {
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.xp {
+    z-index: 10;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #b0b0b0;
+}
+
+#totalXP {
+    margin-top: 20px;
+    font-size: 40px;
+    color: #00eeff;
+    /* Light blue font color */
+    text-shadow: 0 0 3px #00aabb, /* Darker, sharper glow */
+    0 0 6px #00aabb, /* Slightly larger and darker glow */
+    0 0 9px #0099aa, /* Medium, darker glow */
+    0 0 12px #0099aa;
+    /* Slightly larger, darker glow */
+    text-align: center;
+    /* Center the text */
+    display: block;
+    /* Make sure it takes full width */
+}
+
+#lastProjects {
+    color: #4e09bd;
+    display: block;
+    font-size: 12px;
+    /* Adjusted font size */
+    line-height: 1.2;
+    margin-bottom: 10%;
+    /* Space between elements */
+    text-align: justify;
+    /* Justify text */
+    margin-left: 10%;
+    /* Largest glow */
+    /* Align text to the left */
 }

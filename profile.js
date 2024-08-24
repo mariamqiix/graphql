@@ -1,5 +1,6 @@
 var userId;
 
+// our graphql querys
 const userTransactionQuery = `
                 query GetTransactionData($userId: Int!) {
                   transaction(where: { _and: [{ userId: { _eq: $userId } }, { type: { _eq: "xp" } }] }) {                    id
@@ -115,21 +116,36 @@ const userSkillsQuery = `
         }
   `;
 
+const userStats = `
+  query GetDevStatus($userId: Int!)  {
+    user(where: {id: {_eq: $userId}}) {
+      attrs
+    }
+  }
+`;
+
+////
+
+/// start the profile
+
 async function start() {
     try {
         const user = await getUser(); // Wait for getUser function to resolve
         userId = user.id;
         const transactionUpData = await fetchData(userTransactionUpQuery);
-        const transactionDownData = await fetchData(userTransactionDownQuery);
         const progress = await fetchData(userProgressQuery);
-        const result = await fetchData(userResultQuery);
         const userData = await fetchData(userDetailsQuery);
+        const skills = await fetchData(userSkillsQuery);
+        const stats = await fetchData(userStats);
+        const userTransaction = await fetchData(userTransactionQuery);
+        UserXp(userTransaction);
+        console.log(stats);
+        createRadarChart(skills, "radarChartDiv");
         // Call the function to display user information
-        addAuditRatio(userData, transactionUpData.transaction, transactionDownData.transaction);
+        addAuditRatio(userData, transactionUpData.transaction);
         PieChart(generateSlices(createPathObject(transactionUpData.transaction)));
         const username = userData.user[0].login;
         const level = userData.event_user[0].level;
-        console.log(userData);
         document.getElementById("userName").innerHTML = username;
         document.getElementById("level").innerHTML = level;
     } catch (error) {
@@ -139,6 +155,9 @@ async function start() {
 
 start();
 
+/////
+
+/// get the user
 async function getUser() {
     try {
         const response = await fetch("https://learn.reboot01.com/api/graphql-engine/v1/graphql", {
@@ -180,7 +199,9 @@ async function getUser() {
         console.error("GraphQL Error:", error);
     }
 }
+/// end
 
+// to fetch the data
 async function fetchData(query) {
     const variables = { userId };
     try {
@@ -216,6 +237,8 @@ async function fetchData(query) {
         console.error("GraphQL Error:", error);
     }
 }
+
+// end
 
 /// to create teh pie chart
 
@@ -332,35 +355,40 @@ function PieChart(slices) {
 /// end of the pie chart decleration
 
 //// audit ratio bar
-
 function addAuditRatio(userData, transactionUpData, transactionDownData) {
     const auditRatio = userData.user[0].auditRatio;
 
-    // Calculate total amount for transactionUpData
-    const totalUpAmount = transactionUpData.reduce((accumulator, transaction) => {
-        return accumulator + transaction.amount;
-    }, 0);
+    // Calculate total amount for transactionUpData and transactionDownData
+    const totalUpAmount = userData.user[0].totalUp;
+    const totalDownAmount = userData.user[0].totalDown;
 
-    // Calculate total amount for transactionDownData
-    const totalDownAmount = transactionDownData.reduce((accumulator, transaction) => {
-        return accumulator + transaction.amount;
-    }, 0);
+    // Set max value for scaling bar lengths
+    const maxValue = Math.max(totalUpAmount, totalDownAmount, 1); // Prevent division by zero
 
-    document.getElementById("doneValue").innerHTML = formatToBillions(totalDownAmount);
-    document.getElementById("receivedValue").innerHTML = formatToBillions(totalDownAmount);
-    document.getElementById("userRatio").innerHTML = auditRatio.toFixed(1);
+    // Calculate bar widths relative to maxValue
+    const doneBarWidth = (totalUpAmount / maxValue) * 180; // Adjust to your desired max width
+    const receivedBarWidth = (totalDownAmount / maxValue) * 180; // Adjust to your desired max width
 
-    if (auditRatio.toFixed(1) < 1) {
-        document.getElementById("userMessage").innerHTML = "you are so bad";
-    } else if (auditRatio.toFixed(1) === 1) {
-        document.getElementById("userMessage").innerHTML = "nice work";
+    // Update the text content
+    document.getElementById("doneValue").textContent = formatToBillions(totalUpAmount);
+    document.getElementById("receivedValue").textContent = formatToBillions(totalDownAmount);
+    document.getElementById("userRatio").textContent = auditRatio.toFixed(1);
+
+    // Update bar widths
+    document.getElementById("doneBar").setAttribute("width", doneBarWidth);
+    document.getElementById("receivedBar").setAttribute("width", receivedBarWidth);
+    document.getElementById("doneValue").setAttribute("x", 5 + doneBarWidth);
+    document.getElementById("doneText").setAttribute("x", 5 + doneBarWidth);
+    document.getElementById("receivedValue").setAttribute("x", 5 + receivedBarWidth);
+    document.getElementById("receivedText").setAttribute("x", 5 + receivedBarWidth);
+    // Update the message based on auditRatio
+    if (auditRatio < 1) {
+        document.getElementById("userMessage").textContent = "you are so bad";
+    } else if (auditRatio === 1) {
+        document.getElementById("userMessage").textContent = "nice work";
     } else {
-        document.getElementById("userMessage").innerHTML = "يابن المحظوظة";
+        document.getElementById("userMessage").textContent = "يابن المحظوظة";
     }
-    // Optionally calculate a combined ratio or any other metric as needed
-    console.log("Total Done:", formatToBillions(totalDownAmount));
-    console.log("Total Received:", formatToBillions(totalUpAmount));
-    console.log("Combined Audit Ratio:", auditRatio.toFixed(1));
 }
 
 // Helper function to format numbers to billions with two decimal places
@@ -368,4 +396,233 @@ function formatToBillions(amount) {
     const billion = 1e6;
     const roundedAmount = (amount / billion).toFixed(2);
     return `${roundedAmount} MB`;
+}
+
+/// end
+
+///user skills
+
+function createRadarChart(data, containerId) {
+    // Configuration for the radar chart
+    const config = {
+        size: 400,
+        radius: 100,
+        levels: 5,
+        maxValue: 100,
+        factor: 1,
+        factorLegend: 0.95, // Adjusted for better label positioning
+        offsetX: -40, // Horizontal offset
+        offsetY: 0, // Vertical offset
+    };
+
+    // Extract types and amounts from the data
+    const labels = data.user[0].transactions.map((transaction) => transaction.type);
+    const dataPoints = data.user[0].transactions.map((transaction) => transaction.amount);
+
+    // Calculate radius based on the config
+    const chartRadius = config.radius;
+    const svg = createSvgContainer(config.size);
+
+    // Draw radar background
+    drawRadarBackground(svg, labels, chartRadius, config);
+
+    // Draw data points
+    drawDataPoints(svg, dataPoints, labels.length, chartRadius, config);
+
+    // Append the SVG to the specified container
+    document.getElementById(containerId).appendChild(svg);
+
+    // Function to create SVG container
+    function createSvgContainer(size) {
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("width", size);
+        svg.setAttribute("height", size);
+        svg.style.background = "none"; // Transparent background
+        return svg;
+    }
+
+    // Function to draw radar background with borders
+    function drawRadarBackground(svg, labels, radius, config) {
+        const angleSlice = (Math.PI * 2) / labels.length;
+
+        for (let level = 0; level < config.levels; level++) {
+            const levelFactor = config.factor * radius * ((level + 1) / config.levels);
+            const points = [];
+
+            for (let i = 0; i < labels.length; i++) {
+                const x = config.offsetX + config.size / 2 + levelFactor * Math.sin(i * angleSlice);
+                const y = config.offsetY + config.size / 2 - levelFactor * Math.cos(i * angleSlice);
+                points.push([x, y]);
+            }
+
+            const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+            polygon.setAttribute("points", points.map((p) => p.join(",")).join(" "));
+            polygon.setAttribute("fill", "none"); // Transparent fill for background polygons
+            polygon.setAttribute("stroke", "#00d4ff");
+            polygon.setAttribute("stroke-width", 1);
+            svg.appendChild(polygon);
+        }
+
+        // Draw lines between each type
+        for (let i = 0; i < labels.length; i++) {
+            const x =
+                config.offsetX +
+                config.size / 2 +
+                config.factor * radius * Math.sin(i * angleSlice);
+            const y =
+                config.offsetY +
+                config.size / 2 -
+                config.factor * radius * Math.cos(i * angleSlice);
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", config.offsetX + config.size / 2);
+            line.setAttribute("y1", config.offsetY + config.size / 2);
+            line.setAttribute("x2", x);
+            line.setAttribute("y2", y);
+            line.setAttribute("stroke", "#999");
+            line.setAttribute("stroke-width", 1);
+            svg.appendChild(line);
+        }
+
+        // Draw labels on the borders, centered between the vertices, parallel with the edges
+        for (let i = 0; i < labels.length; i++) {
+            const angle = angleSlice * (i + 0.5); // Position halfway between two vertices
+            const labelX =
+                config.offsetX + config.size / 2 + config.factorLegend * radius * Math.sin(angle);
+            const labelY =
+                config.offsetY + config.size / 2 - config.factorLegend * radius * Math.cos(angle);
+            const rotationAngle = (angle * 180) / Math.PI; // Convert radians to degrees
+
+            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.setAttribute("x", labelX);
+            text.setAttribute("y", labelY);
+            text.setAttribute("text-anchor", "middle");
+            text.setAttribute("fill", "white"); // White labels
+            text.setAttribute("transform", `rotate(${rotationAngle}, ${labelX}, ${labelY})`); // Rotate text
+            text.textContent = labels[i];
+            text.style.fontSize = "10px"; // Adjust font size as needed
+            svg.appendChild(text);
+        }
+
+        // Draw levels with smaller text
+        for (let level = 0; level < config.levels; level++) {
+            const levelFactor = config.factor * radius * ((level + 1) / config.levels);
+            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.setAttribute("x", config.offsetX + config.size / 2 + 5); // Positioning next to the center
+            text.setAttribute("y", config.offsetY + config.size / 2 - levelFactor);
+            text.setAttribute("fill", "#999");
+            text.setAttribute("font-size", "8px"); // Smaller text size
+            text.textContent = (((level + 1) * config.maxValue) / config.levels).toString();
+            svg.appendChild(text);
+        }
+    }
+
+    // Function to draw data points on the radar chart
+    function drawDataPoints(svg, dataPoints, numPoints, radius, config) {
+        const angleSlice = (Math.PI * 2) / numPoints;
+        const points = dataPoints.map((amount, i) => {
+            const x =
+                config.offsetX +
+                config.size / 2 +
+                config.factor * radius * (amount / config.maxValue) * Math.sin(i * angleSlice);
+            const y =
+                config.offsetY +
+                config.size / 2 -
+                config.factor * radius * (amount / config.maxValue) * Math.cos(i * angleSlice);
+            return [x, y];
+        });
+
+        // Draw the data polygon
+        const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        polygon.setAttribute("points", points.map((p) => p.join(",")).join(" "));
+        polygon.setAttribute("fill", "rgba(0, 174, 255, 0.4)");
+        // polygon.setAttribute("stroke", "rgba(0, 204, 232, 0.)");
+        polygon.setAttribute("stroke-width", 2);
+        svg.appendChild(polygon);
+
+        // Draw data points with color #00aadf
+        points.forEach((point) => {
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("cx", point[0]);
+            circle.setAttribute("cy", point[1]);
+            circle.setAttribute("r", 3);
+            circle.setAttribute("fill", "#00aadf"); // Custom point color
+            svg.appendChild(circle);
+        });
+    }
+}
+
+/////
+function sumXpForSpecificPath(userTransactionQueryData) {
+    // Check if the transaction data is valid and an array
+    if (!userTransactionQueryData || !Array.isArray(userTransactionQueryData.transaction)) {
+        console.error("Invalid data format");
+        return { totalXp: 0, projectXp: {} };
+    }
+
+    // Extract the transaction array from the query result
+    const transactions = userTransactionQueryData.transaction;
+
+    // Sort transactions by 'createdAt' in ascending order
+    transactions.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+    // Initialize an object to store XP sums for each project
+    const projectXp = {};
+
+    // Calculate the sum of the amounts where path contains "/bahrain/bh-module"
+    const totalXpSum = transactions.reduce((sum, transaction) => {
+        // Check if the path contains the specified substring and amount is a number
+        if (
+            transaction.path &&
+            transaction.path.includes("/bahrain/bh-module") &&
+            !transaction.path.includes("piscine-js/") &&
+            !transaction.path.includes("quest") &&
+            !transaction.path.includes("checkpoint-01") &&
+            typeof transaction.amount === "number"
+        ) {
+            // Add to the total sum
+            sum += transaction.amount;
+
+            // Extract the project name or path for grouping
+            const projectName = transaction.path;
+
+            // Add to the project's XP sum
+            if (!projectXp[projectName]) {
+                projectXp[projectName] = 0;
+            }
+            projectXp[projectName] += transaction.amount;
+        }
+        return sum;
+    }, 0);
+
+    return { totalXp: totalXpSum, projectXp: projectXp };
+}
+
+function UserXp(userTransactionQueryData) {
+    // Get the calculated data
+    const { totalXp, projectXp } = sumXpForSpecificPath(userTransactionQueryData);
+
+    // Update the total XP span
+    const totalXpElement = document.getElementById("totalXP");
+    totalXpElement.innerText = `${formatToBillions(totalXp)}`;
+
+    // Clear previous project spans, if any
+    const xpElement = document.getElementById("lastProjects");
+    xpElement.innerHTML = ""; // Clear existing content
+
+    // Get the last 3 projects based on their insertion order and reverse to display the latest ones
+    const projectKeys = Object.keys(projectXp);
+    const lastThreeProjects = projectKeys.slice(-3).reverse();
+
+    // Create a new span for each project and append it to the container
+    lastThreeProjects.forEach((project) => {
+        const projectName = project.replace("/bahrain/bh-module/", "");
+        const projectSpan = document.createElement("span");
+        projectSpan.innerText = `${projectName} - ${projectXp[project]}B`;
+
+        // Style the project span to match your design
+        projectSpan.style.marginRight = "10px";
+        projectSpan.style.display = "inline-block"; // This keeps them side by side
+        projectSpan.setAttribute("text-align", "justify");
+        xpElement.appendChild(projectSpan);
+    });
 }
