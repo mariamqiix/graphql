@@ -239,12 +239,12 @@ body {
 
 .box3 {
     width: 320px;
-    height: 320px;
+    height: 440px;
 }
 
 .box4 {
     width: 320px;
-    height: 320px;
+    height: 440px;
 }
 
 
@@ -353,9 +353,8 @@ body {
 #tooltip {
     display: none;
     /* Hidden by default */
-    position: absolute;
+    position: relative;
     /* Positioned absolutely to stay within the container */
-    bottom: 0;
     /* Align tooltip at the bottom of the pieChartDiv */
     left: 50%;
     /* Center the tooltip horizontally */
@@ -363,20 +362,11 @@ body {
     /* Center the tooltip with respect to its own width */
     font-size: 12px;
     color: aliceblue;
-    /* background-color: rgba(0, 0, 0, 0.7); */
-    /* Keep it minimal, for better readability */
-    padding: 2px 5px;
-    /* Reduced padding to keep it close to the text */
-    border-radius: 4px;
-    /* Rounded corners */
     z-index: 15;
     /* Ensure tooltip is above other elements */
     white-space: nowrap;
     /* Prevent the tooltip text from breaking into multiple lines */
     height: auto;
-    /* Ensure the height of the tooltip is determined by its content */
-    box-shadow: none;
-    /* Remove any shadow if not needed */
 }
 
 .ratio {
@@ -439,4 +429,21 @@ body {
     margin-left: 10%;
     /* Largest glow */
     /* Align text to the left */
+}
+
+#chartTitle {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), /* White glow */
+    0 0 20px rgba(255, 255, 255, 0.6), /* Larger white glow */
+    0 0 30px rgba(255, 255, 255, 0.4);
+    /* Even larger white glow */
+}
+
+#radarChartDiv {
+    display: flex;
+    flex-direction: column;
+    /* Arrange elements in a column */
+    justify-content: baseline;
 }

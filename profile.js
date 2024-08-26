@@ -137,9 +137,10 @@ async function start() {
         const userData = await fetchData(userDetailsQuery);
         const skills = await fetchData(userSkillsQuery);
         const stats = await fetchData(userStats);
+        // const idk = await fetchData(objectQuery);
         const userTransaction = await fetchData(userTransactionQuery);
         UserXp(userTransaction);
-        console.log(stats);
+        // console.log(idk); --- idk how to use it
         createRadarChart(skills, "radarChartDiv");
         // Call the function to display user information
         addAuditRatio(userData, transactionUpData.transaction);
@@ -319,14 +320,14 @@ function appendPathToSVG(svgElement, pathData, fillColor, pathId) {
     // Adding event listeners to the newly created path
     newPath.addEventListener("mouseenter", () => {
         tooltip.style.display = "block";
-        tooltip.textContent = newPath.id;
+        tooltip.textContent = newPath.id.split("/").pop();
     });
 
     newPath.addEventListener("mousemove", (event) => {
         // Calculate tooltip position relative to pieChartDiv
         const pieChartRect = svgElement.getBoundingClientRect();
-        const tooltipX = event.clientX - pieChartRect.left;
-        const tooltipY = event.clientY - pieChartRect.top;
+        const tooltipX = event.clientX - pieChartRect.left - 50;
+        const tooltipY = event.clientY - 200;
 
         tooltip.style.left = `${tooltipX}px`;
         tooltip.style.top = `${tooltipY + 10}px`; // Slight offset below the cursor
@@ -411,8 +412,8 @@ function createRadarChart(data, containerId) {
         maxValue: 100,
         factor: 1,
         factorLegend: 0.95, // Adjusted for better label positioning
-        offsetX: -40, // Horizontal offset
-        offsetY: 0, // Vertical offset
+        offsetX: 0, // Horizontal offset
+        offsetY: -50, // Vertical offset
     };
 
     // Extract types and amounts from the data
