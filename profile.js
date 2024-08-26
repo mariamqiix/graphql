@@ -214,6 +214,8 @@ async function getUser() {
             }),
         });
 
+        console.log(localStorage.getItem("jwtToken"));
+
         if (!response.ok) {
             throw new Error("Network response was not ok");
         }
@@ -660,3 +662,10 @@ function UserXp(userTransactionQueryData) {
         xpElement.appendChild(projectSpan);
     });
 }
+
+
+document.getElementById('signOut').addEventListener('click', function () {
+        localStorage.removeItem('jwtToken');
+        window.location.href = 'index.html';
+});
+

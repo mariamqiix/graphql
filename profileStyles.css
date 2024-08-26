@@ -121,12 +121,20 @@ body {
     margin-top: 10px;
     align-items: center;
     /* Align items vertically in the center */
-    justify-content: space-between;
     /* Distribute space between items */
     padding: 10px;
     width: 85%;
     margin-bottom: 20px;
+    float: right;
+    clear: right;
+    cursor: pointer;
+    font-size: 12px;
     /* Optional: Add margin to create space below the #logout div */
+}
+
+#logout:hover{
+    cursor: pointer;
+    text-decoration: underline;
 }
 
 .control {
@@ -148,6 +156,9 @@ body {
     4px 4px 12px rgba(255, 255, 255, 0.2), /* Second layer of shadow */
     6px 6px 16px rgba(255, 255, 255, 0.1);
     /* Third layer of shadow */
+    float: left;
+    clear: left;
+    margin-top: 10px;
 }
 
 
