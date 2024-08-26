@@ -204,7 +204,6 @@ async function getUser() {
 
 // to fetch the data
 async function fetchData(query) {
-    const variables = { userId };
     try {
         const response = await fetch("https://learn.reboot01.com/api/graphql-engine/v1/graphql", {
             method: "POST",
@@ -213,8 +212,7 @@ async function fetchData(query) {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                query,
-                variables,
+                query
             }),
         });
 
