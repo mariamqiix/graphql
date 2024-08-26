@@ -1,124 +1,151 @@
-var userId;
+var userId; // Assuming you define this variable elsewhere in your code
 
-// our graphql querys
+// 1. User Transaction Queries
+
 const userTransactionQuery = `
-                query GetTransactionData($userId: Int!) {
-                  transaction(where: { _and: [{ userId: { _eq: $userId } }, { type: { _eq: "xp" } }] }) {                    id
-                    type
-                    amount
-                    objectId
-                    userId
-                    createdAt
-                    path
-                  }
-                }`;
+  query GetTransactionData {
+    transaction(where: { type: { _eq: "xp" } }) {
+      id
+      type
+      amount
+      objectId
+      userId
+      createdAt
+      path
+    }
+  }
+`;
 
 const userTransactionUpQuery = `
-                query GetTransactionData($userId: Int!) {
-                  transaction(where: { _and: [{ userId: { _eq: $userId } }, { type: { _eq: "down" } }] }) {                    id
-                    type
-                    amount
-                    objectId
-                    userId
-                    createdAt
-                    path
-                  }
-                }`;
+  query GetTransactionData {
+    transaction(where: { type: { _eq: "up" } }) {
+      id
+      type
+      amount
+      objectId
+      userId
+      createdAt
+      path
+    }
+  }
+`;
 
 const userTransactionDownQuery = `
-                query GetTransactionData($userId: Int!) {
-                  transaction(where: { _and: [{ userId: { _eq: $userId } }, { type: { _eq: "up" } }] }) {                    id
-                    type
-                    amount
-                    objectId
-                    userId
-                    createdAt
-                    path
-                  }
-                }`;
+  query GetTransactionData {
+    transaction(where: { type: { _eq: "down" } }) {
+      id
+      type
+      amount
+      objectId
+      userId
+      createdAt
+      path
+    }
+  }
+`;
+
+// 2. User Progress Query
 
 const userProgressQuery = `
-                query GetUserProgress($userId: Int!) {
-                  progress(where: { userId: { _eq: $userId }, object: { type: { _eq: "project" } } }) {
-                    id
-                    userId
-                    objectId
-                    grade
-                    createdAt
-                    updatedAt
-                    object {
-                      id
-                      name
-                      type
-                      attrs
-                    }
-                  }
-                }`;
+  query GetUserProgress {
+    progress(where: { object: { type: { _eq: "project" } } }) {
+      id
+      userId
+      objectId
+      grade
+      createdAt
+      updatedAt
+      object {
+        id
+        name
+        type
+        attrs
+      }
+    }
+  }
+`;
+
+// 3. User Result Query
 
 const userResultQuery = `
-                query GetUserResult($userId: Int!) {
-                  result(where: { userId: { _eq: $userId } }) {
-                    id
-                    userId
-                    objectId
-                    grade
-                    createdAt
-                    updatedAt
-                  }
-                }`;
+  query GetUserResult {
+    result {
+      id
+      userId
+      objectId
+      grade
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+// 4. Object Query
 
 const objectQuery = `
-              query GetObjectsData($objectIds: [Int!]!) {
-                object(where: { id: { _in: $objectIds } }) {
-                  id
-                  name
-                  type
-                  attrs
-                }
-              }`;
+  query GetObjectsData($objectIds: [Int!]!) {
+    object(where: { id: { _in: $objectIds } }) {
+      id
+      name
+      type
+      attrs
+    }
+  }
+`;
+
+// 5. User Details Query
 
 const userDetailsQuery = `
-       query GetUser($userId: Int!) {
-            user {
-                id
-                login
-                totalUp
-                totalDown
-             	auditRatio
-            }
-            event_user(where: { userId: { _eq: $userId }, eventId:{_eq:20}}){
-                level
-          		userAuditRatio
-            }
-        }`;
+  query GetUser {
+    user {
+      id
+      login
+      totalUp
+      totalDown
+      auditRatio
+    }
+    event_user(where: { eventId: { _eq: 20 } }) {
+      level
+      userAuditRatio
+    }
+  }
+`;
+
+// 6. Basic User Query
 
 const user = `
-        query {
-            user {
-                id
-                login
-            }
-        }
-    `;
+  query GetUser {
+    user {
+      id
+      login
+    }
+  }
+`;
+
+// 7. User Skills Query
 
 const userSkillsQuery = `
-        query test($userId: Int) {
-          user(where: {id: {_eq: $userId}}) {
-            transactions(
-              order_by: [{type: desc}, {amount: desc}]
-              distinct_on: [type]
-              where: {userId: {_eq: $userId}, type: {_in: ["skill_js", "skill_go", "skill_html", "skill_prog", "skill_front-end", "skill_back-end"]}}
-            ) {
-              type
-              amount
-            }
-          }
+  query GetUserSkills {
+    user {
+      transactions(
+        order_by: [{ type: desc }, { amount: desc }]
+        distinct_on: [type]
+        where: {
+          type: { _in: ["skill_js", "skill_go", "skill_html", "skill_prog", "skill_front-end", "skill_back-end"] }
         }
-  `;
+      ) {
+        type
+        amount
+      }
+    }
+  }
+`;
+
+// 8. User Stats Query
 
 const userStats = `
-  query GetDevStatus($userId: Int!)  {
-    user(where: {id: {_eq: $userId}}) {
+  query GetDevStatus {
+    user {
       attrs
     }
   }
@@ -140,7 +167,8 @@ async function start() {
         // const idk = await fetchData(objectQuery);
         const userTransaction = await fetchData(userTransactionQuery);
         UserXp(userTransaction);
-        // console.log(idk); --- idk how to use it
+        hello(stats);
+        console.log(progress);
         createRadarChart(skills, "radarChartDiv");
         // Call the function to display user information
         addAuditRatio(userData, transactionUpData.transaction);
@@ -157,6 +185,13 @@ async function start() {
 start();
 
 /////
+
+//// hello mariam
+
+function hello(stats) {
+    const helloSpan = document.getElementById("userNameHello");
+    helloSpan.textContent = `Hello ${stats.user[0].attrs.firstName} ${stats.user[0].attrs.lastName} !`;
+}
 
 /// get the user
 async function getUser() {
@@ -212,7 +247,7 @@ async function fetchData(query) {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                query
+                query,
             }),
         });
 
@@ -324,8 +359,8 @@ function appendPathToSVG(svgElement, pathData, fillColor, pathId) {
     newPath.addEventListener("mousemove", (event) => {
         // Calculate tooltip position relative to pieChartDiv
         const pieChartRect = svgElement.getBoundingClientRect();
-        const tooltipX = event.clientX - pieChartRect.left - 50;
-        const tooltipY = event.clientY - 200;
+        const tooltipX = event.clientX - pieChartRect.left;
+        const tooltipY = event.clientY - 250;
 
         tooltip.style.left = `${tooltipX}px`;
         tooltip.style.top = `${tooltipY + 10}px`; // Slight offset below the cursor
