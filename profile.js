@@ -549,7 +549,7 @@ function createRadarChart(data, containerId) {
             text.setAttribute("text-anchor", "middle");
             text.setAttribute("fill", "white"); // White labels
             text.setAttribute("transform", `rotate(${rotationAngle}, ${labelX}, ${labelY})`); // Rotate text
-            text.textContent = labels[i];
+            text.textContent = labels[i].split("_").pop(); // Extract the last part of the type
             text.style.fontSize = "10px"; // Adjust font size as needed
             svg.appendChild(text);
         }
@@ -677,7 +677,7 @@ function UserXp(userTransactionQueryData) {
         xpElement.appendChild(projectSpan);
     });
 }
-document.getElementById("signOut").addEventListener("click", function() {
+document.getElementById("signOut").addEventListener("click", function () {
     localStorage.removeItem("jwtToken");
     window.location.href = "index.html";
 });
