@@ -96,20 +96,19 @@ const objectQuery = `
 // 5. User Details Query
 
 const userDetailsQuery = `
-  query GetUser {
-    user {
-      id
-      login
-      totalUp
-      totalDown
-      auditRatio
-    }
-    event_user {
-      level
-      userAuditRatio
-    }
-  }
-`;
+       query GetUser($userId: Int!) {
+            user {
+                id
+                login
+                totalUp
+                totalDown
+             	auditRatio
+            }
+            event_user(where: { userId: { _eq: $userId }, eventId:{_eq:20}}){
+                level
+          		userAuditRatio
+            }
+        }`;
 
 // 6. Basic User Query
 
@@ -161,7 +160,7 @@ async function start() {
         userId = user.id;
         const transactionUpData = await fetchData(userTransactionUpQuery);
         const progress = await fetchData(userProgressQuery);
-        const userData = await fetchData(userDetailsQuery);
+        const userData = await fetchDataWVariable(userDetailsQuery);
         const skills = await fetchData(userSkillsQuery);
         const stats = await fetchData(userStats);
         // const idk = await fetchData(objectQuery);
@@ -257,6 +256,44 @@ async function fetchData(query) {
             },
             body: JSON.stringify({
                 query,
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+
+        if (data.errors) {
+            console.error(data.errors);
+            if (data.errors[0].message === "Could not verify JWT: JWTExpired") {
+                localStorage.removeItem("hasura-jwt");
+                window.location.href = "index.html";
+            }
+            return;
+        }
+
+        return data.data;
+    } catch (error) {
+        console.error("GraphQL Error:", error);
+    }
+}
+
+
+// to fetch the data
+async function fetchDataWVariable(query) {
+    const variables = { userId };
+    try {
+        const response = await fetch("https://learn.reboot01.com/api/graphql-engine/v1/graphql", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                query,
+                variables
             }),
         });
 
