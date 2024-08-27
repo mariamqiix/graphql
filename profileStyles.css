@@ -523,10 +523,6 @@ body {
     /* Align text to the left */
 }
 
-#userName {
-    color: #00eaff;
-}
-
 #chartTitle,
 #userName {
     font-size: 1.5em;
