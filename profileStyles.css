@@ -39,6 +39,7 @@
     font-family: "Amiri", serif;
 }
 
+
 /* Apply the animation on hover */
 
 .block-cube:hover .bg,
@@ -54,6 +55,7 @@
     color: #ffff;
     /* Change text color on hover if needed */
 }
+
 
 /* Other existing styles */
 
@@ -99,6 +101,7 @@ body {
     /* Relative positioning to contain absolute positioning of the tooltip */
     z-index: 5;
 }
+
 
 /* Custom scrollbar for WebKit browsers */
 
@@ -167,14 +170,15 @@ body {
 
 #userNameHello {
     font-size: xx-large;
-    text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.3),
-        /* First layer of shadow */ 4px 4px 12px rgba(255, 255, 255, 0.2),
-        /* Second layer of shadow */ 6px 6px 16px rgba(255, 255, 255, 0.1);
+    text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.3), /* First layer of shadow */
+    4px 4px 12px rgba(255, 255, 255, 0.2), /* Second layer of shadow */
+    6px 6px 16px rgba(255, 255, 255, 0.1);
     /* Third layer of shadow */
     float: left;
     clear: left;
     margin-top: 10px;
 }
+
 
 /* Two items per row, considering gap */
 
@@ -255,9 +259,9 @@ body {
     z-index: 2;
 }
 
-.block-cube.block-input input:focus ~ .bg-right .bg-inner,
-.block-cube.block-input input:focus ~ .bg-top .bg-inner,
-.block-cube.block-input input:focus ~ .bg-inner .bg-inner {
+.block-cube.block-input input:focus~.bg-right .bg-inner,
+.block-cube.block-input input:focus~.bg-top .bg-inner,
+.block-cube.block-input input:focus~.bg-inner .bg-inner {
     top: 100%;
     background: rgba(255, 255, 255, 0.5);
 }
@@ -284,6 +288,7 @@ body {
 .block-cube.block-cube-hover:hover .bg .bg-inner {
     top: 100%;
 }
+
 
 /* Box sizes */
 
@@ -321,7 +326,9 @@ body {
     height: 440px;
 }
 
+
 /* Hover effect for boxes */
+
 
 /* Center text within each box */
 
@@ -364,6 +371,7 @@ body {
     font-size: 2em;
 }
 
+
 /* Add blur effect on hover to the container */
 
 .control.block-cube.box1 .profile {
@@ -392,11 +400,12 @@ body {
     color: rgb(0, 238, 255);
     /* Center the element */
     /* Initially hide the .level element */
-    text-shadow: 0 0 5px rgb(0, 204, 232, 0.8), /* Small glow */ 0 0 10px rgb(0, 204, 232, 0.7),
-        /* Medium glow */ 0 0 15px rgb(0, 204, 232, 0.6),
-        /* Larger glow */ 0 0 20px rgb(0, 204, 232, 0.5),
-        /* Even larger glow */ 0 0 25px rgb(0, 204, 232, 0.4),
-        /* Larger glow */ 0 0 30px rgb(0, 204, 232, 0.3);
+    text-shadow: 0 0 5px rgb(0, 204, 232, 0.8), /* Small glow */
+    0 0 10px rgb(0, 204, 232, 0.7), /* Medium glow */
+    0 0 15px rgb(0, 204, 232, 0.6), /* Larger glow */
+    0 0 20px rgb(0, 204, 232, 0.5), /* Even larger glow */
+    0 0 25px rgb(0, 204, 232, 0.4), /* Larger glow */
+    0 0 30px rgb(0, 204, 232, 0.3);
     /* Largest glow */
 }
 
@@ -419,16 +428,20 @@ body {
     /* Ensure the pie chart is above other elements */
 }
 
-/* Add this CSS to your stylesheet */
 
 /* Add this CSS to your stylesheet */
 
+
 /* Add this CSS to your stylesheet */
+
+
+/* Add this CSS to your stylesheet */
+
 
 /* Add this CSS to your stylesheet */
 
 .glow {
-    filter: drop-shadow(0 10px 30px rgba(15, 29, 121, 0.9));
+    filter: drop-shadow(0 0 30px rgba(0, 58, 119, 0.9));
 }
 
 #tooltip {
@@ -498,9 +511,10 @@ body {
     font-size: 40px;
     color: #00eeff;
     /* Light blue font color */
-    text-shadow: 0 0 3px #00aabb, /* Darker, sharper glow */ 0 0 6px #00aabb,
-        /* Slightly larger and darker glow */ 0 0 9px #0099aa,
-        /* Medium, darker glow */ 0 0 12px #0099aa;
+    text-shadow: 0 0 3px #00aabb, /* Darker, sharper glow */
+    0 0 6px #00aabb, /* Slightly larger and darker glow */
+    0 0 9px #0099aa, /* Medium, darker glow */
+    0 0 12px #0099aa;
     /* Slightly larger, darker glow */
     text-align: center;
     /* Center the text */
@@ -527,9 +541,9 @@ body {
 #userName {
     font-size: 1.5em;
     margin-bottom: 10px;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
-        /* White glow */ 0 0 20px rgba(255, 255, 255, 0.6),
-        /* Larger white glow */ 0 0 30px rgba(255, 255, 255, 0.4);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), /* White glow */
+    0 0 20px rgba(255, 255, 255, 0.6), /* Larger white glow */
+    0 0 30px rgba(255, 255, 255, 0.4);
     /* Even larger white glow */
     text-align: center;
     /* Center the text */
