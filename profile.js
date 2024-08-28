@@ -280,7 +280,6 @@ async function fetchData(query) {
     }
 }
 
-
 // to fetch the data
 async function fetchDataWVariable(query) {
     const variables = { userId };
@@ -293,7 +292,7 @@ async function fetchDataWVariable(query) {
             },
             body: JSON.stringify({
                 query,
-                variables
+                variables,
             }),
         });
 
@@ -342,7 +341,7 @@ function interpolateColor(color1, color2, factor) {
 
 function generateSlices(data) {
     const total = Object.values(data).reduce((sum, value) => sum + value, 0);
-    const colorStops = ["#050152", "#340979", "#00d4ff"];
+    const colorStops = ["#ff00a6", "#790934", "#ff0062"];
     const slices = [];
 
     Object.entries(data).forEach(([path, value], index) => {
@@ -546,7 +545,7 @@ function createRadarChart(data, containerId) {
             const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
             polygon.setAttribute("points", points.map((p) => p.join(",")).join(" "));
             polygon.setAttribute("fill", "none"); // Transparent fill for background polygons
-            polygon.setAttribute("stroke", "#00d4ff");
+            polygon.setAttribute("stroke", "#ff00a6");
             polygon.setAttribute("stroke-width", 1);
             svg.appendChild(polygon);
         }
@@ -622,7 +621,7 @@ function createRadarChart(data, containerId) {
         // Draw the data polygon
         const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
         polygon.setAttribute("points", points.map((p) => p.join(",")).join(" "));
-        polygon.setAttribute("fill", "rgba(0, 174, 255, 0.4)");
+        polygon.setAttribute("fill", "rgba(255, 0, 166, 0.4)");
         // polygon.setAttribute("stroke", "rgba(0, 204, 232, 0.)");
         polygon.setAttribute("stroke-width", 2);
         svg.appendChild(polygon);
@@ -633,7 +632,7 @@ function createRadarChart(data, containerId) {
             circle.setAttribute("cx", point[0]);
             circle.setAttribute("cy", point[1]);
             circle.setAttribute("r", 3);
-            circle.setAttribute("fill", "#00aadf"); // Custom point color
+            circle.setAttribute("fill", "#ff00a6"); // Custom point color
             svg.appendChild(circle);
         });
     }
@@ -714,7 +713,7 @@ function UserXp(userTransactionQueryData) {
         xpElement.appendChild(projectSpan);
     });
 }
-document.getElementById("signOut").addEventListener("click", function () {
+document.getElementById("signOut").addEventListener("click", function() {
     localStorage.removeItem("jwtToken");
     window.location.href = "index.html";
 });
@@ -792,8 +791,8 @@ function createDoughnutChart(slices) {
 // Function to generate slices data from projectXp
 function generateSlices2(projectXp) {
     const total = Object.values(projectXp).reduce((sum, value) => sum + value, 0);
-    const colorStops = ["#340979", "#00d4ff", "#050152"]; // Gradient color stops
     const slices = [];
+    const colorStops = ["#790910", "#ff0062", "#ff00a6"]; // Dark red, orange-red, brown
 
     Object.entries(projectXp).forEach(([projectName, amount], index) => {
         const ratio = amount / total;
